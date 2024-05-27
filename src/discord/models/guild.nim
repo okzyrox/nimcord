@@ -156,7 +156,7 @@ type GuildWelcomeScreen = object
     welcome_channels*: seq[GuildWelcomeScreenChannel]
 
 
-type Guild = object
+type Guild* = object
     id*: SnowFlakeId
     name*: string
     icon*: string # hash

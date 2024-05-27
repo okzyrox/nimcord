@@ -1,62 +1,79 @@
-import uing
+
+import nigui
+app.init()
+
+proc mainAreaContent*(): LayoutContainer =
+  var main_area_container = newLayoutContainer(Layout_Horizontal)
+  main_area_container.xAlign = XAlign_Right
+
+  var dms_list_scroll_area = newLayoutContainer(Layout_Vertical)
+  dms_list_scroll_area.maxWidth = 200
+  dms_list_scroll_area.padding = 20
+
+  var dms_label = newLabel("Direct Messages")
+  dms_list_scroll_area.add(dms_label)
+
+  for i in 0..<10:
+    var button = newButton("DM " & $i)
+    button.width = 150
+    dms_list_scroll_area.add(button)
+  
+  var friends_scroll_area = newLayoutContainer(Layout_Vertical)
+  friends_scroll_area.maxWidth = 450
+  friends_scroll_area.padding = 20
+
+  var friends_label = newLabel("Friends")
+  friends_scroll_area.add(friends_label)
+  
+  for i in 0..<10:
+    var button = newButton("Friend Name Here!!! " & $i)
+    button.width = 150
+    friends_scroll_area.add(button)
+  
+  main_area_container.add(dms_list_scroll_area)
+  main_area_container.add(friends_scroll_area)
+
+  return main_area_container
 
 proc main*() =
-  let main_window:Window = newWindow("Nimcord", 1200, 650)
-  main_window.margined = true
+  var window = newWindow("Nimcord")
 
-  var menu = newMenu("File")
+  window.width = 1100.scaleToDpi
+  window.height = 900.scaleToDpi
 
-  menu.addItem("Open", proc(_: MenuItem, win: Window) =
-    let filename = win.openFile()
 
-    if filename.len == 0:
-      win.error("No file selected", "Don't be alarmed!")
-    else:
-      win.msgBox("File selected", filename)
-  )
+  var main_container = newLayoutContainer(Layout_Horizontal)
+  #main_container.widthMode = WidthMode_Expand
+  #main_container.heightMode = HeightMode_Expand
+  window.add(main_container)
 
-  menu.addItem("Save", proc(_: MenuItem, win: Window) =
-    let filename = win.saveFile()
+  var side_container = newLayoutContainer(Layout_Vertical)
+  side_container.heightMode = HeightMode_Expand
+  side_container.xAlign = XAlign_Left
+  side_container.maxWidth = 100
 
-    if filename.len == 0:
-      win.error("No file selected", "Don't be alarmed!")
-    else:
-      win.msgBox("File selected (don't worry, it's still there)", filename)
-  )
+  var button = newButton("Test1")
+  side_container.add(button)
+
+
+  # Create a container to put inside the ScrollArea
+  var server_list_container = newLayoutContainer(Layout_Vertical)
+
+  for i in 0..<45:
+    var button = newButton("Server " & $i)
+    #button.onClick = proc (e: MouseEvent) =
+    #  echo "Button ", i, " clicked"
+    server_list_container.add(button)
+
+
+  side_container.add(server_list_container)
+
   
-  menu.addQuitItem(
-    proc(): bool =
-      main_window.destroy()
-      return true
-  )
-
-  menu = newMenu("Edit")
-  menu.addCheckItem("Checkable Item")
-  menu.addSeparator()
-  disable menu.addItem("Disabled Item")
-  menu.addPreferencesItem()
-
-  menu = newMenu("Help")
-  menu.addItem("Help")
-  menu.addAboutItem()
-
-  main_window.child = menu
-
-  main_window.margined = true
-
-  let box = newVerticalBox(true)
-  main_window.child = box
-
-  let group = newGroup("Basic Controls", true)
-  box.add group
-
-  let inner = newVerticalBox(true)
-  group.child = inner
-
-  inner.add newButton("Button", proc(_: Button) = main_window.error("Error", "Rotec"))
 
 
-  show main_window
-  mainLoop()
+  main_container.add(side_container)
+  main_container.add(mainAreaContent())
 
-init()
+
+  window.show()
+  app.run()

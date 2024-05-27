@@ -65,6 +65,11 @@ type Connection* = object
     show_activity*: bool
     visibility*: ServiceVisibility
 
+
+type UserAvatarDecoration = object
+    asset*: string # hash
+    sku_id*: SnowFlakeId
+
 type User* = object
     id*: SnowFlakeId
     username*: string
@@ -82,6 +87,8 @@ type User* = object
     flags*: UserFlags
     premium_type*: UserPremium
     public_flags*: UserFlags
-    avatar_decoration*: string # hash
+    avatar_decoration*: UserAvatarDecoration # hash
+
+    #
     connections*: seq[Connection]
 
