@@ -1,5 +1,7 @@
 
 import nigui
+from elements import newHyperLinkButton
+
 app.init()
 
 proc mainAreaContent*(): LayoutContainer =
@@ -14,7 +16,7 @@ proc mainAreaContent*(): LayoutContainer =
   dms_list_scroll_area.add(dms_label)
 
   for i in 0..<10:
-    var button = newButton("DM " & $i)
+    var button = newHyperLinkButton("DM " & $i, "https://nim-lang.org/")
     button.width = 150
     dms_list_scroll_area.add(button)
   
