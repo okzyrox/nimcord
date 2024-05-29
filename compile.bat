@@ -1,1 +1,2 @@
-nim --app:gui c src/nimcord.nim
+::--app:gui
+nim c src/nimcord.nim

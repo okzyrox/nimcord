@@ -1,8 +1,11 @@
 
 import nigui
-from elements import newHyperLinkButton
+from elements import newHyperLinkButton, newImageButton, newImageButtonWithText, ImageTextAlign
 
 app.init()
+
+let image = newImage()
+image.loadFromFile("resources/discord.64x64.png")
 
 proc mainAreaContent*(): LayoutContainer =
   var main_area_container = newLayoutContainer(Layout_Horizontal)
@@ -16,7 +19,8 @@ proc mainAreaContent*(): LayoutContainer =
   dms_list_scroll_area.add(dms_label)
 
   for i in 0..<10:
-    var button = newHyperLinkButton("DM " & $i, "https://nim-lang.org/")
+    #var button = newHyperLinkButton("DM " & $i, "https://nim-lang.org/")
+    var button = newImageButtonWithText(image, "Dm " & $i, Left)
     button.width = 150
     dms_list_scroll_area.add(button)
   
