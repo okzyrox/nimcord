@@ -35,7 +35,7 @@ method handleDrawEvent(control: ImageButton, event: DrawEvent) =
 
 method handleClickEvent(control: ImageButton, event: ClickEvent) =
   procCall control.ControlImpl.handleClickEvent(event)
-  control.forceRedraw
+  #control.forceRedraw
 
 
 proc newImageButton*(image: Image): ImageButton =
@@ -61,12 +61,10 @@ method handleDrawEvent(control: ImageButtonWithText, event: DrawEvent) =
   canvas.drawTextCentered(text, 0, 0)
 
 
-
 method handleClickEvent(control: ImageButtonWithText, event: ClickEvent) =
   procCall control.ControlImpl.handleClickEvent(event)
   echo control.id
   #control.forceRedraw
-
 
 
 proc newImageButtonWithText*(id: int, image: Image, text: string, custom_width = 64, custom_height = 64): ImageButtonWithText =
