@@ -14,6 +14,7 @@ method handleDrawEvent(control: HyperLinkButton, event: DrawEvent) =
   canvas.drawRectOutline(0, 0, control.width, control.height)
 
 
+
 proc newHyperLinkButton*(text = "", url = ""): Button =
   result = new HyperLinkButton
   result.init()
@@ -24,13 +25,15 @@ proc newHyperLinkButton*(text = "", url = ""): Button =
 
 type ImageButton = ref object of ControlImpl
   image: Image
+  custom_width: int
+  custom_height: int
 
 
 method handleDrawEvent(control: ImageButton, event: DrawEvent) =
   let canvas = control.canvas
   let image = control.image
 
-  canvas.drawImage(image, 0, 0, control.width, control.height)
+  canvas.drawImage(image, 0, 0, control.custom_width, control.custom_height)
 
 
 method handleClickEvent(control: ImageButton, event: ClickEvent) =
@@ -38,9 +41,11 @@ method handleClickEvent(control: ImageButton, event: ClickEvent) =
   #control.forceRedraw
 
 
-proc newImageButton*(image: Image): ImageButton =
+proc newImageButton*(image: Image, custom_width = 64, custom_height = 64): ImageButton =
   result = new ImageButton
   result.image = image
+  result.custom_width = custom_width
+  result.custom_height = custom_height
   result.init()
   
 
