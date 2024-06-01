@@ -35,7 +35,6 @@ method handleDrawEvent(control: ImageButton, event: DrawEvent) =
 
 method handleClickEvent(control: ImageButton, event: ClickEvent) =
   procCall control.ControlImpl.handleClickEvent(event)
-  echo "button presse"
   control.forceRedraw
 
 
@@ -45,14 +44,12 @@ proc newImageButton*(image: Image): ImageButton =
   result.init()
   
 
-type ImageTextAlign* = enum
-  Left
-  Right
-
 type ImageButtonWithText = ref object of ControlImpl
+  id: int
   image: Image
   text: string
-  align: ImageTextAlign
+  custom_width: int
+  custom_height: int
 
 
 method handleDrawEvent(control: ImageButtonWithText, event: DrawEvent) =
@@ -60,24 +57,23 @@ method handleDrawEvent(control: ImageButtonWithText, event: DrawEvent) =
   let image = control.image
   let text = control.text
   
-  if control.align == Left:
-    canvas.drawImage(image, 0, 0, control.width, control.height)
-    canvas.drawText(text, 0, 0)
-  else:
-    canvas.drawText(text, 0, 0)
-    canvas.drawImage(image, 0, 0, control.width, control.height)
-  #canvas.drawImage(image, 0, 0, control.width, control.height)
+  canvas.drawImage(image, 0, 0, control.custom_width, control.custom_height)
+  canvas.drawTextCentered(text, 0, 0)
+
 
 
 method handleClickEvent(control: ImageButtonWithText, event: ClickEvent) =
   procCall control.ControlImpl.handleClickEvent(event)
-  echo "button presse"
-  control.forceRedraw
+  echo control.id
+  #control.forceRedraw
 
 
-proc newImageButtonWithText*(image: Image, text: string, align: ImageTextAlign = Left): ImageButtonWithText =
+
+proc newImageButtonWithText*(id: int, image: Image, text: string, custom_width = 64, custom_height = 64): ImageButtonWithText =
   result = new ImageButtonWithText
+  result.id = id
   result.image = image
   result.text = text
-  result.align = align
+  result.custom_width = custom_width
+  result.custom_height = custom_height
   result.init()

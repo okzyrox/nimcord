@@ -1,6 +1,6 @@
 
 import nigui
-from elements import newHyperLinkButton, newImageButton, newImageButtonWithText, ImageTextAlign
+from elements import newHyperLinkButton, newImageButton, newImageButtonWithText
 
 app.init()
 
@@ -20,7 +20,10 @@ proc mainAreaContent*(): LayoutContainer =
 
   for i in 0..<10:
     #var button = newHyperLinkButton("DM " & $i, "https://nim-lang.org/")
-    var button = newImageButtonWithText(image, "Dm " & $i, Left)
+    var button = newImageButtonWithText(i, image, "DM " & $i, 50, 50)
+    #button.onClick = proc (e: ClickEvent) =
+    #  echo i
+    
     button.width = 150
     dms_list_scroll_area.add(button)
   
@@ -44,7 +47,7 @@ proc mainAreaContent*(): LayoutContainer =
 proc main*() =
   var window = newWindow("Nimcord")
 
-  window.width = 1100.scaleToDpi
+  window.width = 1200.scaleToDpi
   window.height = 900.scaleToDpi
 
 
