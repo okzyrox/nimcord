@@ -1,85 +1,128 @@
+import glad/gl
+import glfw
+from glfw/wrapper import showWindow
+import nanovg
 
-import nigui, nigui/msgbox
-from elements import newHyperLinkButton, newImageButton, newImageButtonWithText
+import koi
 
-app.init()
+var vg: NVGContext
 
-let image = newImage()
-image.loadFromFile("resources/discord.64x64.png")
+import ui as screen_ui
 
-proc mainAreaContent*(): LayoutContainer =
-  var main_area_container = newLayoutContainer(Layout_Horizontal)
-  main_area_container.xAlign = XAlign_Right
+proc createWindow(): Window =
+  var cfg = DefaultOpenglWindowConfig
+  # TODO
+  cfg.size = (w: 1000, h: 800)
+#  cfg.size = (w: 300, h: 300)
+  cfg.title = "Koi Test"
+  cfg.resizable = true
+  cfg.visible = true
+  cfg.bits = (r: 8, g: 8, b: 8, a: 8, stencil: 8, depth: 16)
+#  cfg.transparentFramebuffer = true
+#  cfg.focusOnShow = true
+#  cfg.decorated = false
+  cfg.nMultiSamples = 4
 
-  var dms_list_scroll_area = newLayoutContainer(Layout_Vertical)
-  dms_list_scroll_area.maxWidth = 200
-  dms_list_scroll_area.padding = 20
+  when defined(macosx):
+    cfg.version = glv32
+    cfg.forwardCompat = true
+    cfg.profile = opCoreProfile
 
-  var dms_label = newLabel("Direct Messages")
-  dms_list_scroll_area.add(dms_label)
+  newWindow(cfg)
 
-  for i in 0..<18:
-    var button = newImageButtonWithText(i, image, "DM " & $i, 50, 50)
-    
-    button.width = 150
-    dms_list_scroll_area.add(button)
+
+proc renderUI(winWidth, winHeight, fbWidth, fbHeight: int) =
+  #[
+  vg.beginPath()
+  vg.rect(0, 0, winWidth.float, winHeight.float)
+  vg.fillColor(nanovg.gray(0.5))
+  vg.fill()
+  screen_ui.UI(vg, winWidth, winHeight, fbWidth, fbHeight)]#
+  koi.beginFrame(winWidth, winHeight, fbWidth, fbHeight)
+
+  vg.beginPath()
+  vg.rect(0, 0, winWidth.float, winHeight.float)
+  vg.fillColor(gray(0.3))
+  vg.fill()
+
+  let
+    w = 110.0
+    h = 22.0
+    pad = h + 8
+  var
+    x = 100.0
+    y = 70.0
+
+  var labelStyle = getDefaultLabelStyle()
+  labelStyle.fontSize = 15.0
+  labelStyle.color = gray(0.8)
+
+  #  vg.scissor(0, 0, 630, 100)
+
+  koi.label(x, y, 200, h, "Koi widget tests", style = labelStyle)
+
+  # Buttons
+  y += pad
+  if koi.button(x, y, w, h, "Start", tooltip = "I am the first!"):
+    echo "button 1 pressed"
   
-  var friends_scroll_area = newLayoutContainer(Layout_Vertical)
-  friends_scroll_area.maxWidth = 450
-  friends_scroll_area.padding = 8
-
-  var friends_label = newLabel("Friends")
-  friends_scroll_area.add(friends_label)
-  
-  for i in 0..<25:
-    var button = newImageButtonWithText(i, image, "Friend " & $i, 32, 32)
-    button.width = 150
-    friends_scroll_area.add(button)
-  
-  main_area_container.add(dms_list_scroll_area)
-  main_area_container.add(friends_scroll_area)
-
-  return main_area_container
-
-proc sideAreaContent*(): LayoutContainer =
-  var side_container = newLayoutContainer(Layout_Vertical)
-  side_container.heightMode = HeightMode_Expand
-  side_container.xAlign = XAlign_Left
-  side_container.maxWidth = 100
-
-  var button = newButton("Test1")
-  side_container.add(button)
-
-  var server_list_container = newLayoutContainer(Layout_Vertical)
-
-  for i in 0..<45:
-    var button = newImageButton(image)
-    server_list_container.add(button)
+  koi.endFrame()
 
 
-  side_container.add(server_list_container)
-  return side_container
+proc init(): Window =
+  glfw.initialize()
 
-proc main*() =
-  var window = newWindow("Nimcord")
+  var win = createWindow()
 
-  window.width = 1280.scaleToDpi
-  window.height = 720.scaleToDpi
+  nvgInit(getProcAddress)
+  vg = nvgCreateContext({nifStencilStrokes, nifAntialias, nifDebug})
+
+  if not gladLoadGL(getProcAddress):
+    quit "Error initialising OpenGL"
+
+  #loadData(vg)
+
+  koi.init(vg, getProcAddress)
+
+  #win.windowPositionCb = windowPosCb
+  #win.framebufferSizeCb = framebufSizeCb
+
+  glfw.swapInterval(1)
+
+  win.pos = (400, 150) 
+  wrapper.showWindow(win.getHandle())
+
+  result = win
 
 
-  var main_container = newLayoutContainer(Layout_Horizontal)
-  window.add(main_container)
+proc renderFrame(win: Window, res: tuple[w, h: int32] = (0,0)) =
+  let
+    (winWidth, winHeight) = win.size
+    (fbWidth, fbHeight) = win.framebufferSize
 
-  
-  main_container.add(sideAreaContent())
-  main_container.add(mainAreaContent())
+  renderUI(winWidth, winHeight, fbWidth, fbHeight)
 
-  window.onCloseClick = proc(event: CloseClickEvent) =
+  glfw.swapBuffers(win)
 
-    case window.msgBox("Are you sure you want to quit?", "Quit?", "Quit", "Minimize", "Cancel")
-    of 1: window.dispose()
-    of 2: window.minimize()
-    else: discard
+proc cleanup() =
+  koi.deinit()
+  nvgDeleteContext(vg)
+  glfw.terminate()
 
-  window.show()
-  app.run()
+
+proc mainApp*() =
+  let win = init()
+  echo "Starting!"
+
+  while not win.shouldClose: 
+    if koi.shouldRenderNextFrame():
+      glfw.pollEvents()
+
+      if isKeyDown(keyEscape):
+        echo "Closing!"
+        win.shouldClose = true
+    else:
+      glfw.waitEvents()
+    renderFrame(win)
+
+  cleanup()
