@@ -11,16 +11,14 @@ import ui as screen_ui
 
 proc createWindow(): Window =
   var cfg = DefaultOpenglWindowConfig
-  # TODO
-  cfg.size = (w: 1000, h: 800)
-#  cfg.size = (w: 300, h: 300)
-  cfg.title = "Koi Test"
+  cfg.size = (w: 1200, h: 1100)
+  cfg.title = "Nimcord"
   cfg.resizable = true
   cfg.visible = true
   cfg.bits = (r: 8, g: 8, b: 8, a: 8, stencil: 8, depth: 16)
-#  cfg.transparentFramebuffer = true
-#  cfg.focusOnShow = true
-#  cfg.decorated = false
+  #  cfg.transparentFramebuffer = true
+  #  cfg.focusOnShow = true
+  #  cfg.decorated = false
   cfg.nMultiSamples = 4
 
   when defined(macosx):
@@ -32,42 +30,17 @@ proc createWindow(): Window =
 
 
 proc renderUI(winWidth, winHeight, fbWidth, fbHeight: int) =
-  #[
-  vg.beginPath()
-  vg.rect(0, 0, winWidth.float, winHeight.float)
-  vg.fillColor(nanovg.gray(0.5))
-  vg.fill()
-  screen_ui.UI(vg, winWidth, winHeight, fbWidth, fbHeight)]#
-  koi.beginFrame(winWidth, winHeight, fbWidth, fbHeight)
+  screen_ui.UI(vg, winWidth, winHeight, fbWidth, fbHeight)
 
-  vg.beginPath()
-  vg.rect(0, 0, winWidth.float, winHeight.float)
-  vg.fillColor(gray(0.3))
-  vg.fill()
 
-  let
-    w = 110.0
-    h = 22.0
-    pad = h + 8
-  var
-    x = 100.0
-    y = 70.0
+proc loadResources(vg: NVGContext) =
+  let regularFont = vg.createFont("sans", "resources/Roboto-Regular.ttf")
+  if regularFont == NoFont:
+    quit "Could not add font italic.\n"
 
-  var labelStyle = getDefaultLabelStyle()
-  labelStyle.fontSize = 15.0
-  labelStyle.color = gray(0.8)
-
-  #  vg.scissor(0, 0, 630, 100)
-
-  koi.label(x, y, 200, h, "Koi widget tests", style = labelStyle)
-
-  # Buttons
-  y += pad
-  if koi.button(x, y, w, h, "Start", tooltip = "I am the first!"):
-    echo "button 1 pressed"
-  
-  koi.endFrame()
-
+  let boldFont = vg.createFont("sans-bold", "resources/Roboto-Bold.ttf")
+  if boldFont == NoFont:
+    quit "Could not add font italic.\n"
 
 proc init(): Window =
   glfw.initialize()
@@ -80,7 +53,7 @@ proc init(): Window =
   if not gladLoadGL(getProcAddress):
     quit "Error initialising OpenGL"
 
-  #loadData(vg)
+  loadResources(vg)
 
   koi.init(vg, getProcAddress)
 
