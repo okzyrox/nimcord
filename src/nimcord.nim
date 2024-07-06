@@ -1,4 +1,4 @@
 import app/main
 
-when isMainModule:
-  mainApp()
+#when isMainModule:
+#  mainApp()
