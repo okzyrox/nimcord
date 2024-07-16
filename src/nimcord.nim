@@ -1,4 +1,6 @@
-import app/main
+import uing
 
-#when isMainModule:
-#  mainApp()
+import app/main
+when isMainModule:
+    init()
+    mainApp()
